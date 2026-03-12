@@ -16,22 +16,25 @@
         <p>Número de identificacao do silo:</p>
         <input type="text" id="input_identificador" /> <br /><br />
 
-        <p>Altura total do silo (m):</p>
-        <input type="text" id="input_altura" /> <br /><br />
+        <p>Altura total do cilindro do silo (m):</p>
+        <input type="text" id="input_altura" value="0"/> <br /><br />
+
+        <p>Altura do cone até a base do cilindro(CASO A BASE SEJA CONICA)</p>
+        <input type="text" id="input_altura_cone" value="0"/> <br /><br />
 
         <p>Raio do silo (m):</p>
-        <input type="text" id="input_raio" /> <br /><br />
+        <input type="text" id="input_raio" value="0"/> <br /><br />
 
         <p>Distancia do sensor ate o grao (m):</p>
-        <input type="text" id="input_sensor" /> <br /><br />
+        <input type="text" id="input_sensor" value="0"/> <br /><br />
 
         <p>Alarme minimo (%):</p>
-        <input type="text" id="input_min" /> <br /><br />
+        <input type="text" id="input_min" value="0"/> <br /><br />
 
         <p>Alarme maximo (%):</p>
-        <input type="text" id="input_max" /> <br /><br />
+        <input type="text" id="input_max" value="100"/> <br /><br />
 
-        <button onclick="cadastro()">Calcular Metricas do Silo</button>
+        <button onclick="calcularMedidas()">Calcular Metricas do Silo</button>
 
         <div id="div_resultado"></div>
       </div>
@@ -58,36 +61,37 @@
       </div>
     </div>
     <script>
-      function cadastro() {
+      function calcularMedidas(){
+        
         let identificador = input_identificador.value;
-        let altura = Number(input_altura.value);
+        let alturaCilindro = Number(input_altura.value);
+        let alturaCone = Number(input_altura_cone.value);
         let raio = Number(input_raio.value);
         let sensor = Number(input_sensor.value);
         let minimo = Number(input_min.value);
         let maximo = Number(input_max.value);
 
-        let alturaOcupada = altura - sensor;
         let pi = 3.14;
-        let volumeTotal = pi * raio * raio * altura;
-        let volumeOcupado = pi * raio * raio * alturaOcupada;
-        let porcentagem = (alturaOcupada / altura) * 100;
-
-        if (porcentagem <= minimo) {
-          alert(`O SILO ${identificador} ATINGIU O VALOR MÍNIMO`);
-        } else {
-          if (porcentagem >= maximo) {
-            alert(`O SILO ${identificador} ATINGIU O VALOR MÁXIMO`);
-          }
+        let area = pi * raio**2;  
+        let volumeCilindro = area * alturaCilindro;
+        let volumeTotalCone = (1/3) * area * alturaCone;
+        let volumeTotalSilo = volumeTotalCone + volumeCilindro;
+        let volumeGraos = 0;
+        if(sensor >= alturaCilindro){
+          let a = (alturaCilindro + alturaCone) - sensor;
+          volumeGraos += (1/3) * area * a;
+        }else{
+          let b = area * (alturaCilindro - sensor);
+          volumeGraos += volumeTotalCone + b;
         }
 
-        div_resultado.innerHTML = `
-        SILO: ${identificador} <br>
-        Volume Total: ${volumeTotal.toFixed(2)} m³ <br>
-        Volume Ocupado: ${volumeOcupado.toFixed(2)} m³ <br>
-        Ocupação: ${porcentagem.toFixed(2)}%`;
+        let percentual = volumeGraos / volumeTotalSilo * 100;
+
+        console.log(`Volume ocupado por grãos ${volumeGraos}`);
+        console.log(`Percentutal ocupado ${percentual}%`);
       }
 
-     function calcular() {
+     function calcular(){
   let capacidade = Number(input_capacidade.value);
   let volume = Number(input_volume.value);
   let cotacao = Number(input_cotacao.value);
