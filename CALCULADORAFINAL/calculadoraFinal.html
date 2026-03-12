@@ -87,8 +87,12 @@
 
         let percentual = volumeGraos / volumeTotalSilo * 100;
 
-        console.log(`Volume ocupado por grãos ${volumeGraos}`);
-        console.log(`Percentutal ocupado ${percentual}%`);
+        
+        div_resultado.innerHTML = `Silo ${identificador} <br>
+        Volume total: ${volumeTotalSilo.toFixed(2)}m³ <br>
+        Volume ocupado por grãos: ${volumeGraos.toFixed(2)}m³ <br>
+        Percentual ocupado: ${percentual.toFixed(2)}% <br>
+        `
       }
 
      function calcular(){
