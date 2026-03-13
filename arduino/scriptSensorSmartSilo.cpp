@@ -1,71 +1,76 @@
 // Declarando as variáveis
-float tempo;        // A variável tempo recebe o tempo que o som demora para ir e voltar.
-float distancia=0;  // Declarando a variável que vai receber a distância
+float tempo;
+float distancia=0;
 int trig=9;
 int echo=10;
 
-
-
-float alturaSilo = 400;
-float raioSilo = 50;
-float areaCirculo = (raioSilo*raioSilo)* 3.14;
-float volumeTotal = areaCirculo * alturaSilo;
-
+float alturaCilindro = 300;
+float alturaCone = 100;
+float raioSilo = 300;
+float pi = 3.14;
 
 float percentualLimite = 90;
 float percentualMinimo = 10;
 
 
+float areaCirculo = (raioSilo*raioSilo)* pi;
+
+float volumeCilindro = areaCirculo * alturaCilindro;
+float volumeCone = (1.0/3.0) * areaCirculo * alturaCone;
+
+float volumeTotal = volumeCilindro + volumeCone;
+float volumeGraos = 0;
 
 
 
-float distanciaMinima = alturaSilo - (alturaSilo * percentualLimite / 100);
-float distanciaMaxima = alturaSilo - (alturaSilo * percentualMinimo / 100);
-
+float distanciaMinima = alturaCilindro - (alturaCilindro * percentualLimite / 100);
+float distanciaMaxima = alturaCilindro - (alturaCilindro * percentualMinimo / 100);
 
 void setup() {
   Serial.begin(9600);
-  pinMode(trig, OUTPUT);  //Informando que o pino é de saída
-  pinMode(echo, INPUT);   //Informando que o pino é de entrada
- 
- }
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+}
 
 void loop() {
-  
-  digitalWrite(trig, LOW);          //Desligando o envio de som
-  delayMicroseconds(2);             //Tempo que vai ficar desligado
-  digitalWrite (trig, HIGH);        //Liga o envio de som
-  delayMicroseconds(10);            //Tempo que vai ficar ligado
-  digitalWrite (trig, LOW);         //Desligando o envio de som
-  
-  tempo=pulseIn(echo, HIGH);        // A variável "TEMPO" recebe o tempo que o som demora para ir e voltar de um obstaculo
-  
-  //Como o tempo está dobrado, pois é o tempo de ir e voltar, dividimos por 2
-  //Velocidade do som aproximadamente 0.0343 centimetro por microsegundos
-  distancia= (tempo/2)*0.0343 ;   
-  
-  float volumeOcupado = areaCirculo * (alturaSilo - distancia);
-  float percentualOcupado = volumeOcupado/volumeTotal * 100; 
-  
-  
 
-	//Serial.print("Volume : ");
-	//Serial.print(volumeOcupado);
-  	//Serial.println(" centimetros cubicos");
-  	Serial.print(percentualOcupado);
-    Serial.println("%");
-  
-  
-  
-  // Se a distância for menor que 10cm os três LED pisca
-  if (distancia<=distanciaMinima){
-    Serial.println("SILO ACIMA DO LIMITE, VOCÊ PRECISA ENSVAZIAR");
-  }else if(distancia <=distanciaMaxima){
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite (trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite (trig, LOW);
+
+  tempo=pulseIn(echo, HIGH);
+
+  distancia= (tempo/2)*0.0343 ;
+
+  if(distancia >= alturaCilindro){
+
+    float a = (alturaCilindro + alturaCone) - distancia;
+    volumeGraos = (1.0/3.0) * areaCirculo * a;
+
+  }else{
+
+    float b = (alturaCilindro - distancia) * areaCirculo;
+    volumeGraos = volumeCone + b;
+
+  }
+
+  float percentual = volumeGraos/volumeTotal * 100;
+
+  Serial.print("Volume de graos: ");
+  Serial.println(volumeGraos);
+
+  Serial.print("Percentual: ");
+  Serial.println(percentual);
+
+  if (percentual >= percentualLimite){
+    Serial.println("SILO ACIMA DO LIMITE, VOCE PRECISA ESVAZIAR");
+  }else if(percentual >= percentualMinimo){
     Serial.println("SILO DENTRO DO LIMITE");
   }else{
-    Serial.println("SILO ABAIXO DO LIMITE, VOCÊ PRECISA ENCHER");
+    Serial.println("SILO ABAIXO DO LIMITE, VOCE PRECISA ENCHER");
   }
-  
-  delay(1000);
-    
+
+  delay(5000);
 }
