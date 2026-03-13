@@ -86,7 +86,14 @@
         }
 
         let percentual = volumeGraos / volumeTotalSilo * 100;
+        if(percentual < minimo){
+          alert(`O silo ${identificador} está abaixo do limite mínimo de ${minimo}%. Volume atual: ${percentual.toFixed(2)}%`);
 
+        }else if(percentual > maximo){
+          alert(`O silo ${identificador} está acima do limite máximo de ${maximo}%. Volume atual: ${percentual.toFixed(2)}%`);
+        }else{
+          alert(`O silo ${identificador} está dentro dos limites estabelecidos. Volume atual: ${percentual.toFixed(2)}%`);
+        }  
         
         div_resultado.innerHTML = `Silo ${identificador} <br>
         Volume total: ${volumeTotalSilo.toFixed(2)}m³ <br>
